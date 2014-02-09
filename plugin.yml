@@ -1,0 +1,11 @@
+name: Economy
+main: de.amshaegar.economy.EcoMain
+author: AmShaegar
+website: http://wrenchbox.de
+version: 1.0
+description: Economy Plugin.
+commands:
+  test:
+    description: test
+    usage: /test
+permissions:
