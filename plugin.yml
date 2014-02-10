@@ -1,5 +1,5 @@
-name: Economy
-main: de.amshaegar.economy.EcoMain
+name: EcoFlow
+main: de.amshaegar.economy.EcoFlow
 author: AmShaegar
 website: http://wrenchbox.de
 version: 1.0

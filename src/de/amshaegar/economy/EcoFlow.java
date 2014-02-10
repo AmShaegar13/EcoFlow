@@ -15,7 +15,7 @@ import de.amshaegar.economy.db.MySQLConnector;
 import de.amshaegar.economy.db.SQLConnector;
 import de.amshaegar.economy.db.SQLiteConnector;
 
-public class EcoMain extends JavaPlugin {
+public class EcoFlow extends JavaPlugin {
 
 	private static Plugin plugin;
 	private static SQLConnector connector;
@@ -27,6 +27,10 @@ public class EcoMain extends JavaPlugin {
 		new EcoListener();
 
 		getConfig().addDefault("settings.balance.init", 10);
+		getConfig().addDefault("settings.currency.symbol", "$");
+		getConfig().addDefault("settings.currency.leading", true);
+		getConfig().addDefault("settings.currency.singular", "dollar");
+		getConfig().addDefault("settings.currency.plural", "dollars");
 		
 		getConfig().addDefault("database.mysql.use", false);
 		getConfig().addDefault("database.mysql.host", "localhost");

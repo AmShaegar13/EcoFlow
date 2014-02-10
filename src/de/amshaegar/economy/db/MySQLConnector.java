@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import de.amshaegar.economy.EcoMain;
+import de.amshaegar.economy.EcoFlow;
 
 public class MySQLConnector implements SQLConnector {
 	
@@ -41,7 +41,7 @@ public class MySQLConnector implements SQLConnector {
 
 	@Override
 	public void createTables() throws SQLException {
-		String prefix = EcoMain.getPlugin().getConfig().getString("database.prefix");
+		String prefix = EcoFlow.getPlugin().getConfig().getString("database.prefix");
 		PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+prefix+"player` (" +
 				"  `id` INTEGER AUTO_INCREMENT PRIMARY KEY," +
 				"  `name` VARCHAR" +
@@ -51,7 +51,7 @@ public class MySQLConnector implements SQLConnector {
 				"  `id` INTEGER AUTO_INCREMENT PRIMARY KEY," +
 				"  `time` DATETIME," +
 				"  `player` INTEGER," +
-				"  `amount` INTEGER," +
+				"  `amount` FLOAT," +
 				"  `subject` VARCHAR," +
 				");");
 		ps.execute();

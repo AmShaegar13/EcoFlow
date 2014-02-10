@@ -8,14 +8,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class EcoListener implements Listener {
 
 	public EcoListener() {
-		EcoMain.getPlugin().getServer().getPluginManager().registerEvents(this, EcoMain.getPlugin());
+		EcoFlow.getPlugin().getServer().getPluginManager().registerEvents(this, EcoFlow.getPlugin());
 	}
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		Player p = event.getPlayer();
-		EcoProvider provider = EcoMain.getProvider();
+		EcoProvider provider = EcoFlow.getProvider();
 		provider.createAccount(p.getName());
-		p.sendMessage(String.format("Welcome back, %s. Balance: %d", p.getName(), provider.getBalance(event.getPlayer().getName())));
 	}
 }
