@@ -3,10 +3,7 @@ package de.amshaegar.economy;
 import java.sql.SQLException;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +22,10 @@ public class EcoFlow extends JavaPlugin {
 	public void onEnable() {
 		plugin = this;
 		new EcoListener();
+		CommandExecutor ce = new EcoExecutor();
+		getCommand("balance").setExecutor(ce);
+		getCommand("deposit").setExecutor(ce);
+		getCommand("withdraw").setExecutor(ce);
 
 		getConfig().addDefault("settings.balance.init", 10);
 		getConfig().addDefault("settings.currency.symbol", "$");
@@ -75,21 +76,6 @@ public class EcoFlow extends JavaPlugin {
 			Bukkit.getLogger().warning("Failed to properly close database connection: "+e.getMessage());
 		}
 	}
-	   
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
-    	if(commandLabel.equalsIgnoreCase("test")) {
-    		if(sender instanceof Player) {
-    			if(args.length != 1) {
-    				return false;
-    			}
-    			//Player p = (Player) sender;
-    			// do something with player
-    		} else {
-    			sender.sendMessage(ChatColor.DARK_RED+"Only players can do that.");
-    		}
-        }
-        return true;
-    }
 
 	public static Plugin getPlugin() {
 		return plugin;

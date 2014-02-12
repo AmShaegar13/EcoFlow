@@ -189,10 +189,9 @@ public class EcoProvider {
 				return new Transaction(true);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return new Transaction(false, "Transaction failed: "+e.getMessage());
 		}
-		return new Transaction(false, "Failed to insert transaction into database.");
+		return new Transaction(false, "Transaction failed due to an unknown reason.");
 	}
 
 	public String format(float amount) {

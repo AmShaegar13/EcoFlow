@@ -47,7 +47,7 @@ public class SQLiteConnector implements SQLConnector {
 		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+prefix+"transaction` (" +
 				"  `id` INTEGER PRIMARY KEY," +
 				"  `time` DATETIME," +
-				"  `player` INTEGER," +
+				"  `player` INTEGER NOT NULL," +
 				"  `amount` REAL," +
 				"  `subject` VARCHAR" +
 				");");

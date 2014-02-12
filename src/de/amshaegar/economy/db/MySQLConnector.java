@@ -26,7 +26,7 @@ public class MySQLConnector implements SQLConnector {
 
 	@Override
 	public void open() throws SQLException {
-		connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s", host, port, db), user, pass);
+		connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?autoReconnect=true", host, port, db), user, pass);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class MySQLConnector implements SQLConnector {
 		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+prefix+"transaction` (" +
 				"  `id` INTEGER AUTO_INCREMENT PRIMARY KEY," +
 				"  `time` DATETIME," +
-				"  `player` INTEGER," +
+				"  `player` INTEGER NOT NULL," +
 				"  `amount` FLOAT," +
 				"  `subject` VARCHAR," +
 				");");
