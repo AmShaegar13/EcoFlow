@@ -1,5 +1,6 @@
 package de.amshaegar.economy;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.bukkit.Bukkit;
@@ -11,17 +12,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.amshaegar.economy.db.MySQLConnector;
 import de.amshaegar.economy.db.SQLConnector;
 import de.amshaegar.economy.db.SQLiteConnector;
+import de.amshaegar.economy.http.WebInterface;
 
 public class EcoFlow extends JavaPlugin {
 
 	private static Plugin plugin;
 	private static SQLConnector connector;
 	private static EcoProvider provider;
+	
+	private WebInterface web;
 
 	@Override
 	public void onEnable() {
 		plugin = this;
-		new EcoListener();
 		CommandExecutor ce = new EcoExecutor();
 		getCommand("balance").setExecutor(ce);
 		getCommand("deposit").setExecutor(ce);
@@ -42,11 +45,20 @@ public class EcoFlow extends JavaPlugin {
 		getConfig().addDefault("database.mysql.password", "password");
 		getConfig().addDefault("database.prefix", "eco_");
 		getConfig().addDefault("database.sqlite.filename", "plugins/"+getName()+"/transactions.db");
-		
+
+		getConfig().addDefault("web.enable", true);
 		getConfig().addDefault("web.port", 8080);
 		
 		getConfig().options().copyDefaults(true);
 		saveConfig();
+
+		if(getConfig().getBoolean("web.enable"))
+		try {
+			web = new WebInterface(getConfig().getInt("web.port"));
+		} catch (IOException e) {
+			Bukkit.getLogger().warning("Failed to start web interface: "+e.getMessage());
+		}
+		new EcoListener();
 		
 		if(getConfig().getBoolean("database.mysql.use")) {
 			connector = new MySQLConnector(
@@ -73,8 +85,12 @@ public class EcoFlow extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		HandlerList.unregisterAll();
+		web.stop();
+		plugin = null;
+		provider = null;
 		try {
 			connector.close();
+			connector = null;
 		} catch (SQLException e) {
 			Bukkit.getLogger().warning("Failed to properly close database connection: "+e.getMessage());
 		}
