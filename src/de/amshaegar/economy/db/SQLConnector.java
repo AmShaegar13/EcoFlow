@@ -3,10 +3,21 @@ package de.amshaegar.economy.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public interface SQLConnector {
+public abstract class SQLConnector {
 
-	public void open() throws SQLException;
-	public void close() throws SQLException;
-	public Connection getConnection();
-	public void createTables() throws SQLException;
+	protected Connection connection;
+
+	public abstract void open() throws SQLException;
+	public abstract void createTables() throws SQLException;
+	
+	public void close() throws SQLException {
+		connection.close();
+	}
+
+	public Connection getConnection() {
+		return connection;
+	}
+	
+	public abstract String getTableName(String table);
+
 }

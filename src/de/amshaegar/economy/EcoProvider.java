@@ -10,6 +10,8 @@ import java.util.Locale;
 
 import org.bukkit.Bukkit;
 
+import de.amshaegar.economy.db.SQLConnector;
+
 /**
  * @author AmShaegar
  *
@@ -17,12 +19,10 @@ import org.bukkit.Bukkit;
 public class EcoProvider {
 
 	private HashMap<String, Float> balances = new HashMap<String, Float>();
-	private String prefix;
-	private Connection connection;
+	private SQLConnector connector;
 
 	public EcoProvider() {
-		prefix = EcoFlow.getPlugin().getConfig().getString("database.prefix");
-		connection = EcoFlow.getConnector().getConnection();
+		connector = EcoFlow.getConnector();
 	}
 
 	/**
@@ -34,15 +34,17 @@ public class EcoProvider {
 		if(balances.containsKey(player)) {
 			return false;
 		}
+		
+		Connection c = connector.getConnection();
 
 		try {
 			// check if player already exists
-			PreparedStatement selectId = connection.prepareStatement("SELECT id FROM "+prefix+"player WHERE name = ?");
+			PreparedStatement selectId = c.prepareStatement("SELECT id FROM "+connector.getTableName("player")+" WHERE name = ?");
 			selectId.setString(1, player);
 			ResultSet rs = selectId.executeQuery();
 			if(!rs.next()) {
 				// add player to database
-				PreparedStatement insertPlayer = connection.prepareStatement("INSERT INTO "+prefix+"player (name) VALUES (?)");
+				PreparedStatement insertPlayer = c.prepareStatement("INSERT INTO "+connector.getTableName("player")+" (name) VALUES (?)");
 				insertPlayer.setString(1, player);
 				if(insertPlayer.executeUpdate() == 0) {
 					Bukkit.getLogger().severe("Could not add player to the database: "+player);
@@ -50,7 +52,7 @@ public class EcoProvider {
 				}
 
 				// deposit initial balance
-				Transaction t = deposit(player, EcoFlow.getPlugin().getConfig().getInt("settings.balance.init"), "initial balance");
+				Transfer t = deposit(player, EcoFlow.getPlugin().getConfig().getInt("settings.balance.init"), "initial balance");
 				return t.isSuccess();
 			}
 		} catch (SQLException e) {
@@ -70,8 +72,10 @@ public class EcoProvider {
 			return balances.get(player);
 		}
 
+		Connection c = connector.getConnection();
+
 		try {
-			PreparedStatement getBalance = connection.prepareStatement("SELECT SUM(amount) FROM "+prefix+"transaction AS t JOIN "+prefix+"player AS p ON t.player = p.id WHERE name = ?");
+			PreparedStatement getBalance = c.prepareStatement("SELECT SUM(amount) FROM "+connector.getTableName("transfer")+" AS t JOIN "+connector.getTableName("player")+" AS p ON t.player = p.id WHERE name = ?");
 			getBalance.setString(1, player);
 			ResultSet rs = getBalance.executeQuery();
 			if(rs.next()) {
@@ -114,7 +118,7 @@ public class EcoProvider {
 	}
 
 	/**
-	 * Deposit an amount of money to the player's account. The transaction subject will be
+	 * Deposit an amount of money to the player's account. The transfer subject will be
 	 * automatically chosen by determining the calling method from the stack trace. This will
 	 * result in a subject like:
 	 * <pre>
@@ -125,27 +129,27 @@ public class EcoProvider {
 	 * @param amount	amount of money to deposit.
 	 * @return			<code>true</code> if successful. Otherwise <code>false</code>.
 	 */
-	public Transaction deposit(String player, float amount) {
+	public Transfer deposit(String player, float amount) {
 		return deposit(player, amount, getCaller());
 	}
 
 	/**
-	 * Deposit an amount of money to the player's account with a specific transaction subject.
+	 * Deposit an amount of money to the player's account with a specific transfer subject.
 	 * 
 	 * @param player	name of the player.
 	 * @param amount	amount of money to deposit.
-	 * @param subject	the subject for the transaction log.
+	 * @param subject	the subject for the transfer log.
 	 * @return			<code>true</code> if successful. Otherwise <code>false</code>.
 	 */
-	public Transaction deposit(String player, float amount, String subject) {
+	public Transfer deposit(String player, float amount, String subject) {
 		if(amount < 0) {
-			return new Transaction(false, "Cannot deposit negative amount.");
+			return new Transfer(false, "Cannot deposit negative amount.");
 		}
 		return transfer(player, amount, subject);
 	}
 
 	/**
-	 * Withdraw an amount of money from the player's account. The transaction subject will be
+	 * Withdraw an amount of money from the player's account. The transfer subject will be
 	 * automatically chosen by determining the calling method from the stack trace. This will
 	 * result in a subject like:
 	 * <pre>
@@ -156,31 +160,32 @@ public class EcoProvider {
 	 * @param amount	amount of money to deposit.
 	 * @return			<code>true</code> if successful. Otherwise <code>false</code>.
 	 */
-	public Transaction withdraw(String player, float amount) {
+	public Transfer withdraw(String player, float amount) {
 		return withdraw(player, amount, getCaller());
 	}
 
 	/**
-	 * Withdraw an amount of money from the player's account with a specific transaction subject.
+	 * Withdraw an amount of money from the player's account with a specific transfer subject.
 	 * 
 	 * @param player	name of the player.
 	 * @param amount	amount of money to deposit.
-	 * @param subject	the subject for the transaction log.
+	 * @param subject	the subject for the transfer log.
 	 * @return			<code>true</code> if successful. Otherwise <code>false</code>.
 	 */
-	public Transaction withdraw(String player, float amount, String subject) {
+	public Transfer withdraw(String player, float amount, String subject) {
 		if(amount < 0) {
-			return new Transaction(false, "Cannot withdraw negative amount.");
+			return new Transfer(false, "Cannot withdraw negative amount.");
 		}
 		if(amount > getBalance(player)) {
-			return new Transaction(false, "Player does not have that much money.");
+			return new Transfer(false, "Player does not have that much money.");
 		}
 		return transfer(player, -amount, subject);
 	}
 
-	private Transaction transfer(String player, float amount, String subject) {
+	private Transfer transfer(String player, float amount, String subject) {
+		Connection c = connector.getConnection();
 		try {
-			PreparedStatement insertBalance = connection.prepareStatement("INSERT INTO "+prefix+"transaction (time, player, amount, subject) VALUES (?, (SELECT id FROM "+prefix+"player WHERE name = ?), ?, ?)");
+			PreparedStatement insertBalance = c.prepareStatement("INSERT INTO "+connector.getTableName("transfer")+" (time, player, amount, subject) VALUES (?, (SELECT id FROM "+connector.getTableName("player")+" WHERE name = ?), ?, ?)");
 			insertBalance.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
 			insertBalance.setString(2, player);
 			insertBalance.setFloat(3, amount);
@@ -188,12 +193,12 @@ public class EcoProvider {
 			float balance = getBalance(player);
 			if(insertBalance.executeUpdate() != 0) {
 				balances.put(player, balance+amount);
-				return new Transaction(true);
+				return new Transfer(true);
 			}
 		} catch (SQLException e) {
-			return new Transaction(false, "Transaction failed: "+e.getMessage());
+			return new Transfer(false, "Transfer failed: "+e.getMessage());
 		}
-		return new Transaction(false, "Transaction failed due to an unknown reason.");
+		return new Transfer(false, "Transfer failed due to an unknown reason.");
 	}
 
 	public String format(float amount) {

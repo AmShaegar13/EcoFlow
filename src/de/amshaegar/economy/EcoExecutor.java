@@ -50,7 +50,7 @@ public class EcoExecutor implements CommandExecutor {
 			}
 			try {
 				Float amount = Float.parseFloat(args[1].replace(',', '.'));
-				Transaction t = eco.deposit(p.getName(), amount, String.format("deposit by command (%s)", sender.getName()));
+				Transfer t = eco.deposit(p.getName(), amount, String.format("deposit by command (%s)", sender.getName()));
 				if(!t.isSuccess()) {
 					sender.sendMessage(ChatColor.DARK_RED+t.getMessage());
 					return true;
@@ -78,7 +78,7 @@ public class EcoExecutor implements CommandExecutor {
 			}
 			try {
 				Float amount = Float.parseFloat(args[1].replace(',', '.'));
-				Transaction t = eco.withdraw(p.getName(), amount, String.format("withdrawal by command (%s)", sender.getName()));
+				Transfer t = eco.withdraw(p.getName(), amount, String.format("withdrawal by command (%s)", sender.getName()));
 				if(!t.isSuccess()) {
 					sender.sendMessage(ChatColor.DARK_RED+t.getMessage());
 					return true;

@@ -1,15 +1,15 @@
 package de.amshaegar.economy;
 
-public class Transaction {
+public class Transfer {
 
 	private boolean success;
 	private String message;
 	
-	public Transaction(boolean success) {
+	public Transfer(boolean success) {
 		this.success = success;
 	}
 	
-	public Transaction(boolean success, String message) {
+	public Transfer(boolean success, String message) {
 		this(success);
 		this.message = message;
 	}

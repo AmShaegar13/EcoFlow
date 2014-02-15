@@ -1,16 +1,12 @@
 package de.amshaegar.economy.db;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import de.amshaegar.economy.EcoFlow;
-
-public class SQLiteConnector implements SQLConnector {
+public class SQLiteConnector extends SQLConnector {
 	
 	private String filename;
-	private Connection connection;
 
 	public SQLiteConnector(String filename) {
 		this.filename = filename;
@@ -28,23 +24,13 @@ public class SQLiteConnector implements SQLConnector {
 	}
 
 	@Override
-	public void close() throws SQLException {
-		connection.close();
-	}
-	
-	public Connection getConnection() {
-		return connection;
-	}
-
-	@Override
 	public void createTables() throws SQLException {
-		String prefix = EcoFlow.getPlugin().getConfig().getString("database.prefix");
-		PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+prefix+"player` (" +
+		PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `player` (" +
 				"  `id` INTEGER PRIMARY KEY," +
 				"  `name` VARCHAR" +
 				");");
 		ps.execute();
-		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+prefix+"transaction` (" +
+		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `transfer` (" +
 				"  `id` INTEGER PRIMARY KEY," +
 				"  `time` DATETIME," +
 				"  `player` INTEGER NOT NULL," +
@@ -52,6 +38,11 @@ public class SQLiteConnector implements SQLConnector {
 				"  `subject` VARCHAR" +
 				");");
 		ps.execute();
+	}
+
+	@Override
+	public String getTableName(String table) {
+		return table;
 	}
 
 }

@@ -41,10 +41,10 @@ public class EcoFlow extends JavaPlugin {
 		getConfig().addDefault("database.mysql.host", "localhost");
 		getConfig().addDefault("database.mysql.port", 3306);
 		getConfig().addDefault("database.mysql.database", "dbname");
+		getConfig().addDefault("database.mysql.prefix", "eco_");
 		getConfig().addDefault("database.mysql.user", "username");
 		getConfig().addDefault("database.mysql.password", "password");
-		getConfig().addDefault("database.prefix", "eco_");
-		getConfig().addDefault("database.sqlite.filename", "plugins/"+getName()+"/transactions.db");
+		getConfig().addDefault("database.sqlite.filename", "plugins/"+getName()+"/transfers.db");
 
 		getConfig().addDefault("web.enable", true);
 		getConfig().addDefault("web.port", 8080);
@@ -65,6 +65,7 @@ public class EcoFlow extends JavaPlugin {
 					getConfig().getString("database.mysql.host"),
 					getConfig().getInt("database.mysql.port"),
 					getConfig().getString("database.mysql.database"),
+					getConfig().getString("database.mysql.prefix"),
 					getConfig().getString("database.mysql.user"),
 					getConfig().getString("database.mysql.password")
 					);
