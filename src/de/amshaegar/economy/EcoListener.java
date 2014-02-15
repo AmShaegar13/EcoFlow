@@ -1,9 +1,9 @@
 package de.amshaegar.economy;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class EcoListener implements Listener {
 
@@ -13,8 +13,11 @@ public class EcoListener implements Listener {
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
-		Player p = event.getPlayer();
-		EcoProvider provider = EcoFlow.getProvider();
-		provider.createAccount(p.getName());
+		EcoFlow.getProvider().createAccount(event.getPlayer().getName());
+	}
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent event) {
+		EcoFlow.getProvider().clearCache(event.getPlayer().getName());
 	}
 }

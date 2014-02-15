@@ -14,4 +14,10 @@ commands:
   withdraw:
     description: Withdraaw amount from <player>'s account.
     usage: /withdraw <player> <amount>
+  createacc:
+    description: Create an account for <player> if they never joined before and deposit initial balance.
+    usage: /createacc <player>
 permissions:
+  ecoflow.admin:
+    description: Allow use of balance modifying and viewing commands.
+    default: op

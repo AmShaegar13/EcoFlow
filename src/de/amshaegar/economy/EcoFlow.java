@@ -26,6 +26,7 @@ public class EcoFlow extends JavaPlugin {
 		getCommand("balance").setExecutor(ce);
 		getCommand("deposit").setExecutor(ce);
 		getCommand("withdraw").setExecutor(ce);
+		getCommand("createacc").setExecutor(ce);
 
 		getConfig().addDefault("settings.balance.init", 10);
 		getConfig().addDefault("settings.currency.symbol", "$");
@@ -41,6 +42,8 @@ public class EcoFlow extends JavaPlugin {
 		getConfig().addDefault("database.mysql.password", "password");
 		getConfig().addDefault("database.prefix", "eco_");
 		getConfig().addDefault("database.sqlite.filename", "plugins/"+getName()+"/transactions.db");
+		
+		getConfig().addDefault("web.port", 8080);
 		
 		getConfig().options().copyDefaults(true);
 		saveConfig();

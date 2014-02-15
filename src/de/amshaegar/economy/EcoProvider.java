@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.bukkit.Bukkit;
 
@@ -29,9 +30,9 @@ public class EcoProvider {
 	 * 
 	 * @param player Name of the player
 	 */
-	public void createAccount(String player) {
+	public boolean createAccount(String player) {
 		if(balances.containsKey(player)) {
-			return;
+			return false;
 		}
 
 		try {
@@ -45,16 +46,17 @@ public class EcoProvider {
 				insertPlayer.setString(1, player);
 				if(insertPlayer.executeUpdate() == 0) {
 					Bukkit.getLogger().severe("Could not add player to the database: "+player);
-					return;
+					return false;
 				}
 
 				// deposit initial balance
-				transfer(player, EcoFlow.getPlugin().getConfig().getInt("settings.balance.init"), "initial balance");
+				Transaction t = deposit(player, EcoFlow.getPlugin().getConfig().getInt("settings.balance.init"), "initial balance");
+				return t.isSuccess();
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Bukkit.getLogger().severe("Failed to create account: "+e.getMessage());
 		}
+		return false;
 	}
 
 	/**
@@ -64,9 +66,9 @@ public class EcoProvider {
 	 * @return			the balance of the player's account
 	 */
 	public float getBalance(String player) {
-//		if(balances.containsKey(player)) {
-//			return balances.get(player);
-//		}
+		if(balances.containsKey(player)) {
+			return balances.get(player);
+		}
 
 		try {
 			PreparedStatement getBalance = connection.prepareStatement("SELECT SUM(amount) FROM "+prefix+"transaction AS t JOIN "+prefix+"player AS p ON t.player = p.id WHERE name = ?");
@@ -195,7 +197,7 @@ public class EcoProvider {
 	}
 
 	public String format(float amount) {
-		StringBuilder s = new StringBuilder(String.format("%.2f", amount));
+		StringBuilder s = new StringBuilder(String.format(Locale.ENGLISH, "%.2f", amount));
 		String symbol = EcoFlow.getPlugin().getConfig().getString("settings.currency.symbol");
 		if(EcoFlow.getPlugin().getConfig().getBoolean("settings.currency.leading")) {
 			s.insert(0, symbol+" ");
@@ -203,5 +205,9 @@ public class EcoProvider {
 			s.append(" "+symbol);
 		}
 		return s.toString();
+	}
+
+	protected void clearCache(String player) {
+		balances.remove(player);
 	}
 }
