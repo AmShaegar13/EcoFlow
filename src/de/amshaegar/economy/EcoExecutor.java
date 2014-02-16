@@ -19,19 +19,19 @@ public class EcoExecutor implements CommandExecutor {
 				}
 				
 				Player p = (Player) sender;
-				p.sendMessage(String.format("Current balance: %s", eco.format(eco.getBalance(p.getName()))));
+				p.sendMessage(String.format(ChatColor.YELLOW+"Current balance: %s", eco.format(eco.getBalance(p.getName()))));
 			} else if(args.length == 1) {
 				if(!sender.hasPermission("ecoflow.admin")) {
 					sender.sendMessage(ChatColor.DARK_RED+"You do not have permission to do this.");
 					return true;
 				}
 				OfflinePlayer p = Bukkit.getOfflinePlayer(args[0]);
-				if(!p.hasPlayedBefore()) {
-					sender.sendMessage(ChatColor.DARK_RED+"Player '"+args[0]+"' does not exist.");
+				if(!p.hasPlayedBefore() && !p.isOnline()) {
+					sender.sendMessage(ChatColor.DARK_RED+"Player "+ChatColor.YELLOW+args[0]+ChatColor.DARK_RED+" does not exist.");
 					return true;
 				}
 				
-				sender.sendMessage(String.format("Balance of %s: %s", p.getName(), eco.format(eco.getBalance(p.getName()))));
+				sender.sendMessage(String.format(ChatColor.YELLOW+"Balance of %s: %s", p.getName(), eco.format(eco.getBalance(p.getName()))));
 			} else {
 				return false;
 			}
@@ -44,7 +44,7 @@ public class EcoExecutor implements CommandExecutor {
 				return false;
 			}
 			OfflinePlayer p = Bukkit.getOfflinePlayer(args[0]);
-			if(!p.hasPlayedBefore()) {
+			if(!p.hasPlayedBefore() && !p.isOnline()) {
 				sender.sendMessage(ChatColor.DARK_RED+"Player "+ChatColor.YELLOW+args[0]+ChatColor.DARK_RED+" does not exist.");
 				return true;
 			}
@@ -72,7 +72,7 @@ public class EcoExecutor implements CommandExecutor {
 				return false;
 			}
 			OfflinePlayer p = Bukkit.getOfflinePlayer(args[0]);
-			if(!p.hasPlayedBefore()) {
+			if(!p.hasPlayedBefore() && !p.isOnline()) {
 				sender.sendMessage(ChatColor.DARK_RED+"Player "+ChatColor.YELLOW+args[0]+ChatColor.DARK_RED+" does not exist.");
 				return true;
 			}
