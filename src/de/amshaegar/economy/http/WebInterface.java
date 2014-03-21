@@ -13,8 +13,9 @@ public class WebInterface {
 
 	public WebInterface(int port) throws IOException {
 		server = HttpServer.create(new InetSocketAddress(port), 0);
-		server.createContext("/", new SimpleHttpHandler());
-		server.createContext("/tpl", new TemplateHttpHandler());
+		server.createContext("/", new TemplateHttpHandler());
+		server.createContext("/auth", new AuthHttpHandler());
+		server.createContext("/intern", new InternHttpHandler());
 		server.start();
 		EcoFlow.getPlugin().getLogger().info(String.format("Web interface started on port %d", server.getAddress().getPort()));
 	}

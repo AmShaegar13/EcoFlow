@@ -14,18 +14,19 @@ public class SimpleHttpHandler implements HttpHandler {
 	
 	@Override
 	public void handle(HttpExchange e) throws IOException {
-		File f = new File(EcoFlow.getPlugin().getDataFolder().getPath()+"/web"+e.getRequestURI().getPath());
+		String dataDir = EcoFlow.getPlugin().getDataFolder().getPath();
+		File f = new File(dataDir+"/web"+e.getRequestURI().getPath());
 		if(f.isDirectory()) {
 			f = new File(f.getPath()+"/index.html");
 		}
 		if(f.exists()) {
 			respond(200, f, e);
 		} else {
-			respond(404, new File(EcoFlow.getPlugin().getDataFolder().getPath()+"/web/404.html"), e);
+			respond(404, new File(dataDir+"/web/error/404.html"), e);
 		}
 	}
 
-	private void respond(int responseCode, File f, HttpExchange e) throws IOException {
+	protected void respond(int responseCode, File f, HttpExchange e) throws IOException {
 		FileInputStream i = new FileInputStream(f);
 		e.sendResponseHeaders(responseCode, f.length());
 		OutputStream o = e.getResponseBody();

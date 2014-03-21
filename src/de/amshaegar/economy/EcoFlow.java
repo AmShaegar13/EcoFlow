@@ -48,6 +48,7 @@ public class EcoFlow extends JavaPlugin {
 
 		getConfig().addDefault("web.enable", true);
 		getConfig().addDefault("web.port", 8080);
+		getConfig().addDefault("web.password", "password");
 		
 		getConfig().options().copyDefaults(true);
 		saveConfig();
