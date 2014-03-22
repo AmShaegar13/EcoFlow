@@ -1,10 +1,7 @@
 package de.amshaegar.economy;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -35,18 +32,12 @@ public class EcoProvider {
 			return false;
 		}
 		
-		Connection c = connector.getConnection();
-
 		try {
 			// check if player already exists
-			PreparedStatement selectId = c.prepareStatement("SELECT id FROM "+connector.getTableName("player")+" WHERE name = ?");
-			selectId.setString(1, player);
-			ResultSet rs = selectId.executeQuery();
+			ResultSet rs = connector.selectPlayer(player);
 			if(!rs.next()) {
 				// add player to database
-				PreparedStatement insertPlayer = c.prepareStatement("INSERT INTO "+connector.getTableName("player")+" (name) VALUES (?)");
-				insertPlayer.setString(1, player);
-				if(insertPlayer.executeUpdate() == 0) {
+				if(!connector.insertPlayer(player)) {
 					Bukkit.getLogger().severe("Could not add player to the database: "+player);
 					return false;
 				}
@@ -72,12 +63,8 @@ public class EcoProvider {
 			return balances.get(player);
 		}
 
-		Connection c = connector.getConnection();
-
 		try {
-			PreparedStatement getBalance = c.prepareStatement("SELECT SUM(amount) FROM "+connector.getTableName("transfer")+" AS t JOIN "+connector.getTableName("player")+" AS p ON t.player = p.id WHERE name = ?");
-			getBalance.setString(1, player);
-			ResultSet rs = getBalance.executeQuery();
+			ResultSet rs = connector.selectBalance(player);
 			if(rs.next()) {
 				float balance = rs.getFloat(1);
 				balances.put(player, balance);
@@ -183,19 +170,11 @@ public class EcoProvider {
 	}
 
 	private Transfer transfer(String player, float amount, String subject) {
-		Connection c = connector.getConnection();
 		try {
 			connector.insertOrIgnoreSubject(subject);
 			
-			PreparedStatement insertBalance = c.prepareStatement("INSERT INTO "+connector.getTableName("transfer")+""
-					+ " (time, player, amount, subject)"
-					+ " VALUES (?, (SELECT id FROM "+connector.getTableName("player")+" WHERE name = ?), ?, (SELECT id FROM "+connector.getTableName("subject")+" WHERE subject = ?))");
-			insertBalance.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-			insertBalance.setString(2, player);
-			insertBalance.setFloat(3, amount);
-			insertBalance.setString(4, subject);
-			float balance = getBalance(player);
-			if(insertBalance.executeUpdate() != 0) {
+			if(connector.insertBalance(player, amount, subject)) {
+				float balance = getBalance(player);
 				balances.put(player, balance+amount);
 				return new Transfer(true);
 			}

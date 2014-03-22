@@ -1,7 +1,10 @@
 package de.amshaegar.economy.db;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public abstract class SQLConnector {
 
@@ -16,11 +19,40 @@ public abstract class SQLConnector {
 		}
 	}
 
-	public Connection getConnection() {
-		return connection;
-	}
-	
 	public abstract String getTableName(String table);
 	public abstract void insertOrIgnoreSubject(String subject) throws SQLException;
+	
+	public ResultSet selectPlayer(String player) throws SQLException {
+		PreparedStatement selectId = connection.prepareStatement("SELECT id FROM "+getTableName("player")+" WHERE name = ?");
+		selectId.setString(1, player);
+		return selectId.executeQuery();
+	}
+	
+	public boolean insertPlayer(String player) throws SQLException {
+		PreparedStatement insertPlayer = connection.prepareStatement("INSERT INTO "+getTableName("player")+" (name) VALUES (?)");
+		insertPlayer.setString(1, player);
+		return insertPlayer.executeUpdate() != 0;
+	}
+	
+	public ResultSet selectBalance(String player) throws SQLException {
+		PreparedStatement getBalance = connection.prepareStatement("SELECT SUM(amount) FROM "+getTableName("transfer")+" AS t JOIN "+getTableName("player")+" AS p ON t.player = p.id WHERE name = ?");
+		getBalance.setString(1, player);
+		return getBalance.executeQuery();
+	}
+	
+	public boolean insertBalance(String player, float amount, String subject) throws SQLException {
+		PreparedStatement insertBalance = connection.prepareStatement("INSERT INTO "+getTableName("transfer")+""
+				+ " (time, player, amount, subject)"
+				+ " VALUES (?, (SELECT id FROM "+getTableName("player")+" WHERE name = ?), ?, (SELECT id FROM "+getTableName("subject")+" WHERE subject = ?))");
+		insertBalance.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+		insertBalance.setString(2, player);
+		insertBalance.setFloat(3, amount);
+		insertBalance.setString(4, subject);
+		return insertBalance.executeUpdate() != 0;
+	}
+	public ResultSet selectTransfers() throws SQLException {
+		PreparedStatement ps = connection.prepareStatement("SELECT * FROM "+getTableName("transfer")+" AS t JOIN "+getTableName("player")+" AS p ON t.player = p.id ORDER BY id DESC LIMIT 25");
+		return ps.executeQuery();
+	}
 
 }

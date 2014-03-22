@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -26,12 +25,10 @@ public class TemplateHttpHandler extends SimpleHttpHandler {
 		String line;
 		while((line = in.readLine()) != null) {
 			if(line.contains("{RECENT_TRANS}")) {
-				SQLConnector c = EcoFlow.getConnector();
-				StringBuilder transfers;
+				SQLConnector connector = EcoFlow.getConnector();
+				StringBuilder transfers = new StringBuilder("<table id=\"transfers\">");;
 				try {
-					PreparedStatement ps = c.getConnection().prepareStatement("SELECT * FROM "+c.getTableName("transfer")+" AS t JOIN "+c.getTableName("player")+" AS p ON t.player = p.id ORDER BY id DESC LIMIT 25");
-					ResultSet rs = ps.executeQuery();
-					transfers = new StringBuilder("<table id=\"transfers\">");
+					ResultSet rs = connector.selectTransfers();
 					while(rs.next()) {
 						transfers.append("<tr><td>");
 						transfers.append(rs.getFloat("amount"));
