@@ -1,11 +1,8 @@
 package de.amshaegar.economy.db;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import de.amshaegar.economy.EcoFlow;
 
 public class MySQLConnector extends SQLConnector {
 	
@@ -15,7 +12,6 @@ public class MySQLConnector extends SQLConnector {
 	private String prefix;
 	private String user;
 	private String pass;
-	private Connection connection;
 
 	public MySQLConnector(String host, int port, String db, String prefix, String user, String pass) {
 		this.host = host;
@@ -30,28 +26,40 @@ public class MySQLConnector extends SQLConnector {
 	public void open() throws SQLException {
 		connection = DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?autoReconnect=true", host, port, db), user, pass);
 	}
+	
+	@Override
+	public String getTableName(String table) {
+		return prefix+table;
+	}
 
 	@Override
 	public void createTables() throws SQLException {
-		String prefix = EcoFlow.getPlugin().getConfig().getString("database.prefix");
-		PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+prefix+"player` (" +
+		PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+getTableName("player")+"` (" +
 				"  `id` INTEGER AUTO_INCREMENT PRIMARY KEY," +
-				"  `name` VARCHAR" +
+				"  `name` VARCHAR(16)" +
 				");");
 		ps.execute();
-		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+prefix+"transfer` (" +
+		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+getTableName("transfer")+"` (" +
 				"  `id` INTEGER AUTO_INCREMENT PRIMARY KEY," +
 				"  `time` DATETIME," +
 				"  `player` INTEGER NOT NULL," +
 				"  `amount` FLOAT," +
-				"  `subject` VARCHAR," +
+				"  `subject` INTEGER" +
+				");");
+		ps.execute();
+		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+getTableName("subject")+"` (" +
+				"  `id` INTEGER AUTO_INCREMENT PRIMARY KEY," +
+				"  `alias` VARCHAR(32)," +
+				"  `subject` VARCHAR(255) UNIQUE" +
 				");");
 		ps.execute();
 	}
-
+	
 	@Override
-	public String getTableName(String table) {
-		return prefix+table;
+	public void insertOrIgnoreSubject(String subject) throws SQLException {
+		PreparedStatement insertSubject = connection.prepareStatement("INSERT IGNORE INTO "+getTableName("subject")+" (subject) VALUES (?)");
+		insertSubject.setString(1, subject);
+		insertSubject.execute();
 	}
 
 }

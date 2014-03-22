@@ -25,11 +25,6 @@ public class EcoFlow extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
-		CommandExecutor ce = new EcoExecutor();
-		getCommand("balance").setExecutor(ce);
-		getCommand("deposit").setExecutor(ce);
-		getCommand("withdraw").setExecutor(ce);
-		getCommand("createacc").setExecutor(ce);
 
 		getConfig().addDefault("settings.balance.init", 10);
 		getConfig().addDefault("settings.currency.symbol", "$");
@@ -59,7 +54,6 @@ public class EcoFlow extends JavaPlugin {
 		} catch (IOException e) {
 			Bukkit.getLogger().warning("Failed to start web interface: "+e.getMessage());
 		}
-		new EcoListener();
 		
 		if(getConfig().getBoolean("database.mysql.use")) {
 			connector = new MySQLConnector(
@@ -78,10 +72,20 @@ public class EcoFlow extends JavaPlugin {
 			connector.open();
 			connector.createTables();
 		} catch (SQLException e) {
-			Bukkit.getLogger().warning("Failed to create necessary tables for economy: "+e.getMessage());
+			getLogger().severe("Failed to create necessary tables for economy: "+e.getMessage());
+			e.printStackTrace();
+			getPluginLoader().disablePlugin(this);
+			return;
 		}
 		
+		CommandExecutor ce = new EcoExecutor();
+		getCommand("balance").setExecutor(ce);
+		getCommand("deposit").setExecutor(ce);
+		getCommand("withdraw").setExecutor(ce);
+		getCommand("createacc").setExecutor(ce);
+		
 		provider = new EcoProvider();
+		new EcoListener();
 	}
 
 	@Override

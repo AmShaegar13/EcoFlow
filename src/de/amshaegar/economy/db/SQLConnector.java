@@ -11,7 +11,9 @@ public abstract class SQLConnector {
 	public abstract void createTables() throws SQLException;
 	
 	public void close() throws SQLException {
-		connection.close();
+		if(connection != null) {
+			connection.close();
+		}
 	}
 
 	public Connection getConnection() {
@@ -19,5 +21,6 @@ public abstract class SQLConnector {
 	}
 	
 	public abstract String getTableName(String table);
+	public abstract void insertOrIgnoreSubject(String subject) throws SQLException;
 
 }

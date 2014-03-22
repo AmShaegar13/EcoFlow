@@ -185,7 +185,11 @@ public class EcoProvider {
 	private Transfer transfer(String player, float amount, String subject) {
 		Connection c = connector.getConnection();
 		try {
-			PreparedStatement insertBalance = c.prepareStatement("INSERT INTO "+connector.getTableName("transfer")+" (time, player, amount, subject) VALUES (?, (SELECT id FROM "+connector.getTableName("player")+" WHERE name = ?), ?, ?)");
+			connector.insertOrIgnoreSubject(subject);
+			
+			PreparedStatement insertBalance = c.prepareStatement("INSERT INTO "+connector.getTableName("transfer")+""
+					+ " (time, player, amount, subject)"
+					+ " VALUES (?, (SELECT id FROM "+connector.getTableName("player")+" WHERE name = ?), ?, (SELECT id FROM "+connector.getTableName("subject")+" WHERE subject = ?))");
 			insertBalance.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
 			insertBalance.setString(2, player);
 			insertBalance.setFloat(3, amount);

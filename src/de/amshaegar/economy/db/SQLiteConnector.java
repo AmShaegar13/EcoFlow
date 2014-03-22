@@ -24,25 +24,38 @@ public class SQLiteConnector extends SQLConnector {
 	}
 
 	@Override
+	public String getTableName(String table) {
+		return table;
+	}
+
+	@Override
 	public void createTables() throws SQLException {
-		PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `player` (" +
+		PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+getTableName("player")+"` (" +
 				"  `id` INTEGER PRIMARY KEY," +
 				"  `name` VARCHAR" +
 				");");
 		ps.execute();
-		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `transfer` (" +
+		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+getTableName("transfer")+"` (" +
 				"  `id` INTEGER PRIMARY KEY," +
 				"  `time` DATETIME," +
 				"  `player` INTEGER NOT NULL," +
 				"  `amount` REAL," +
-				"  `subject` VARCHAR" +
+				"  `subject` INTEGER" +
+				");");
+		ps.execute();
+		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+getTableName("subject")+"` (" +
+				"  `id` INTEGER PRIMARY KEY," +
+				"  `alias` VARCHAR," +
+				"  `subject` VARCHAR UNIQUE" +
 				");");
 		ps.execute();
 	}
-
+	
 	@Override
-	public String getTableName(String table) {
-		return table;
+	public void insertOrIgnoreSubject(String subject) throws SQLException {
+		PreparedStatement insertSubject = connection.prepareStatement("INSERT OR IGNORE INTO "+getTableName("subject")+" (subject) VALUES (?)");
+		insertSubject.setString(1, subject);
+		insertSubject.execute();
 	}
 
 }
