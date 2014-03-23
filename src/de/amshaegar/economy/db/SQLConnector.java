@@ -50,8 +50,12 @@ public abstract class SQLConnector {
 		insertBalance.setString(4, subject);
 		return insertBalance.executeUpdate() != 0;
 	}
-	public ResultSet selectTransfers() throws SQLException {
-		PreparedStatement ps = connection.prepareStatement("SELECT * FROM "+getTableName("transfer")+" AS t JOIN "+getTableName("player")+" AS p ON t.player = p.id ORDER BY id DESC LIMIT 25");
+	public ResultSet selectTransfers(int limit) throws SQLException {
+		PreparedStatement ps = connection.prepareStatement("SELECT *, COALESCE(s.alias, s.subject) AS alisub FROM "+getTableName("transfer")+" AS t"
+				+ " JOIN "+getTableName("player")+" AS p ON t.player = p.id"
+				+ " JOIN "+getTableName("subject")+" AS s ON t.subject = s.id"
+				+ " ORDER BY id DESC LIMIT ?");
+		ps.setInt(1, limit);
 		return ps.executeQuery();
 	}
 
