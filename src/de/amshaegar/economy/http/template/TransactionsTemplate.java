@@ -2,6 +2,7 @@ package de.amshaegar.economy.http.template;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -17,11 +18,11 @@ public class TransactionsTemplate implements Template {
 	}
 
 	@Override
-	public String apply(String sequence, String line) {
+	public String apply(String sequence, String line, Map<String, String> parameters) {
 		SQLConnector connector = EcoFlow.getConnector();
-		StringBuilder transfers = new StringBuilder("<table id=\"transfers\">");;
 		try {
-			ResultSet rs = connector.selectTransfers(limit);
+			StringBuilder transfers = new StringBuilder("<table id=\"transfers\">");
+			ResultSet rs = connector.selectTransfers(parameters.containsKey("limit") ? Integer.parseInt(parameters.get("limit")) : limit);
 			while(rs.next()) {
 				transfers.append("<tr><td>");
 				transfers.append(rs.getDate("time"));
@@ -36,10 +37,12 @@ public class TransactionsTemplate implements Template {
 				transfers.append("</td></tr>");
 			}
 			transfers.append("</table>");
-		} catch (SQLException ex) {
-			transfers = new StringBuilder("<tr><td>Error while getting recent transfers: "+ex.getMessage()+"</td></tr>");
+			return line.replace(sequence, transfers.toString());
+		} catch (SQLException e) {
+			return "Error while getting recent transfers: "+e.getMessage();
+		} catch (NumberFormatException e) {
+			return "Limit is not a valid number: "+e.getMessage();
 		}
-		return line.replace(sequence, transfers);
 	}
 
 }

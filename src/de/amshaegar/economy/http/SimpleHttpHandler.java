@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -18,6 +20,8 @@ public class SimpleHttpHandler implements HttpHandler {
 		File f = new File(dataDir+"/web"+e.getRequestURI().getPath());
 		if(f.isDirectory()) {
 			f = new File(f.getPath()+"/index.html");
+		} else {
+			f = new File(f.getPath()+".html");
 		}
 		if(f.exists()) {
 			respond(200, f, e);
@@ -36,6 +40,20 @@ public class SimpleHttpHandler implements HttpHandler {
 		}
 		i.close();
 		o.close();
+	}
+	
+	protected Map<String, String> parseParameters(String query) {
+		Map<String, String> parameters = new HashMap<String, String>();
+		if(query != null) {
+			String[] pairs = query.split("&");
+			for(String pair : pairs) {
+				String[] keyvalue = pair.split("=");
+				if(keyvalue.length == 2) {
+					parameters.put(keyvalue[0], keyvalue[1]);
+				}
+			};
+		}
+		return parameters;
 	}
 	
 }

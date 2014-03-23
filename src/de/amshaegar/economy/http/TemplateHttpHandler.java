@@ -30,6 +30,7 @@ public class TemplateHttpHandler extends SimpleHttpHandler {
 	@Override
 	protected void respond(int responseCode, File f, HttpExchange e) throws IOException {
 		long start = System.currentTimeMillis();
+		templates.setParameters(parseParameters(e.getRequestURI().getQuery()));
 		e.sendResponseHeaders(responseCode, 0);
 		BufferedReader in = new BufferedReader(new FileReader(f));
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(e.getResponseBody()));
