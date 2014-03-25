@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -16,18 +18,38 @@ public class SimpleHttpHandler implements HttpHandler {
 	
 	@Override
 	public void handle(HttpExchange e) throws IOException {
-		String dataDir = EcoFlow.getPlugin().getDataFolder().getPath();
-		File f = new File(dataDir+"/web"+e.getRequestURI().getPath());
-		if(f.isDirectory()) {
-			f = new File(f.getPath()+"/index.html");
+		String root = EcoFlow.getPlugin().getDataFolder().getPath()+"/web";
+		File f;
+		if(e.getRequestURI().getPath().endsWith("/")) {
+			f = new File(root+e.getRequestURI().getPath()+"index.html");
 		} else {
-			f = new File(f.getPath()+".html");
+			f = new File(root+e.getRequestURI().getPath()+".html");
+			if(!f.exists()) {
+				redirect(301, e.getRequestURI().getPath()+"/", e);
+			}
 		}
 		if(f.exists()) {
-			respond(200, f, e);
+			respond(200, f, e, parseCookie(e));
 		} else {
-			respond(404, new File(dataDir+"/web/error/404.html"), e);
+			error(404, e);
 		}
+	}
+
+	protected Map<String, String> parseCookie(HttpExchange e) {
+		List<String> cookies = e.getRequestHeaders().get("Cookie");
+		Map<String, String> cookie;
+		if(cookies != null) {
+			cookie = parseParameters(cookies.get(0), "; ");
+		} else {
+			cookie = new HashMap<String, String>();
+		}
+		if(cookie.get("session") == null || SessionManager.get(cookie.get("session")) == null) {
+			String session = UUID.randomUUID().toString();
+			SessionManager.create(session);
+			e.getResponseHeaders().set("Set-Cookie", "session="+session+"; Path=/");
+			cookie.put("session", session);
+		}
+		return cookie;
 	}
 
 	protected void respond(int responseCode, File f, HttpExchange e) throws IOException {
@@ -41,11 +63,24 @@ public class SimpleHttpHandler implements HttpHandler {
 		i.close();
 		o.close();
 	}
+
+	protected void respond(int responseCode, File f, HttpExchange e, Map<String, String> cookie) throws IOException {
+		respond(responseCode, f, e);
+	}
+
+	protected void redirect(int responseCode, String to, HttpExchange e) throws IOException {
+		e.getResponseHeaders().set("Location", to);
+		e.sendResponseHeaders(responseCode, -1);
+	}
 	
-	protected Map<String, String> parseParameters(String query) {
+	protected void error(int responseCode, HttpExchange e) throws IOException {
+		respond(responseCode, new File(EcoFlow.getPlugin().getDataFolder().getPath()+"/web/error/"+responseCode+".html"), e);
+	}
+	
+	protected Map<String, String> parseParameters(String query, String split) {
 		Map<String, String> parameters = new HashMap<String, String>();
 		if(query != null) {
-			String[] pairs = query.split("&");
+			String[] pairs = query.split(split);
 			for(String pair : pairs) {
 				String[] keyvalue = pair.split("=");
 				if(keyvalue.length == 2) {

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Map;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -28,9 +29,9 @@ public class TemplateHttpHandler extends SimpleHttpHandler {
 	}
 
 	@Override
-	protected void respond(int responseCode, File f, HttpExchange e) throws IOException {
+	protected void respond(int responseCode, File f, HttpExchange e, Map<String, String> cookie) throws IOException {
 		long start = System.currentTimeMillis();
-		templates.setParameters(parseParameters(e.getRequestURI().getQuery()));
+		templates.setParameters(parseParameters(e.getRequestURI().getQuery(), "&"));
 		e.sendResponseHeaders(responseCode, 0);
 		BufferedReader in = new BufferedReader(new FileReader(f));
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(e.getResponseBody()));

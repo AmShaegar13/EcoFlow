@@ -92,7 +92,9 @@ public class EcoFlow extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		HandlerList.unregisterAll();
-		web.stop();
+		if(web != null) {
+			web.stop();
+		}
 		plugin = null;
 		provider = null;
 		try {

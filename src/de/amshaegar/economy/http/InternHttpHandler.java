@@ -1,17 +1,21 @@
 package de.amshaegar.economy.http;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 
 public class InternHttpHandler extends TemplateHttpHandler {
 	
 	@Override
-	protected void respond(int responseCode, File f, HttpExchange e) throws IOException {
-		// TODO check login
-		if(true) {
-			super.respond(responseCode, f, e);
+	public void handle(HttpExchange e) throws IOException {
+		Map<String, String> cookie = parseCookie(e);
+		Map<String, String> session = SessionManager.get(cookie.get("session"));
+		boolean auth = session != null ? Boolean.parseBoolean(session.get("auth")) : false;
+		if(auth) {
+			super.handle(e);
+		} else {
+			error(403, e);
 		}
 	}
 	
