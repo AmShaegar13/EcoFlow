@@ -24,6 +24,7 @@ public class EcoFlow extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		// TODO extract web directory
 		plugin = this;
 
 		getConfig().addDefault("settings.balance.init", 10);
@@ -45,6 +46,7 @@ public class EcoFlow extends JavaPlugin {
 		getConfig().addDefault("web.port", 8080);
 		getConfig().addDefault("web.password", "password");
 		getConfig().addDefault("web.recent.limit", 25);
+		getConfig().addDefault("web.subjects.limit", 25);
 		
 		getConfig().options().copyDefaults(true);
 		saveConfig();

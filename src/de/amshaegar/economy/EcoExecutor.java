@@ -91,24 +91,8 @@ public class EcoExecutor implements CommandExecutor {
 			} catch(NumberFormatException e) {
 				sender.sendMessage(ChatColor.DARK_RED+String.format(ChatColor.YELLOW+"%s"+ChatColor.DARK_RED+" is not a number.", args[1]));
 			}
-		} else if(commandLabel.equalsIgnoreCase("createacc")) {
-			if(!sender.hasPermission("ecoflow.admin")) {
-				sender.sendMessage(ChatColor.DARK_RED+"You do not have permission to do this.");
-				return true;
-			}
-			if(args.length != 1) {
-				return false;
-			}
-			OfflinePlayer p = Bukkit.getOfflinePlayer(args[0]);
-			if(p.hasPlayedBefore()) {
-				sender.sendMessage(ChatColor.DARK_RED+"Player "+ChatColor.YELLOW+p.getName()+ChatColor.DARK_RED+" already has an account.");
-				return true;
-			}
-			if(!EcoFlow.getProvider().createAccount(p.getName())) {
-				sender.sendMessage(ChatColor.DARK_RED+"Something went wrong. Please check the log.");
-			} else {
-				sender.sendMessage(ChatColor.GREEN+"Account successfully created.");
-			}
+		} else if(commandLabel.equalsIgnoreCase("pay")) {
+			// TODO pay <player> <amount>
 		}
 		return true;
 	}

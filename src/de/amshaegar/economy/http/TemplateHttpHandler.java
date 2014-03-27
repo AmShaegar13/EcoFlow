@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import com.sun.net.httpserver.HttpExchange;
 
 import de.amshaegar.economy.EcoFlow;
+import de.amshaegar.economy.http.template.SubjectsTemplate;
 import de.amshaegar.economy.http.template.TemplateManager;
 import de.amshaegar.economy.http.template.TransactionsTemplate;
 
@@ -24,8 +25,9 @@ public class TemplateHttpHandler extends SimpleHttpHandler {
 		templates = new TemplateManager();
 		
 		FileConfiguration c = EcoFlow.getPlugin().getConfig();
-		
+
 		templates.registerTemplate("{RECENT_TRANS}", new TransactionsTemplate(c.getInt("web.recent.limit")));
+		templates.registerTemplate("{LIST_SUBJECTS}", new SubjectsTemplate(c.getInt("web.subjects.limit")));
 	}
 
 	@Override

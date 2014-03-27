@@ -59,5 +59,10 @@ public abstract class SQLConnector {
 		ps.setInt(1, limit);
 		return ps.executeQuery();
 	}
+	public ResultSet selectSubjects(int limit) throws SQLException {
+		PreparedStatement ps = connection.prepareStatement("SELECT * FROM "+getTableName("subject")+" ORDER BY id DESC LIMIT ?");
+		ps.setInt(1, limit);
+		return ps.executeQuery();
+	}
 
 }
