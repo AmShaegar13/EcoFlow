@@ -40,7 +40,7 @@ public abstract class SQLConnector {
 		return getBalance.executeQuery();
 	}
 	
-	public boolean insertBalance(String player, float amount, String subject) throws SQLException {
+	public boolean insertTransfer(String player, float amount, String subject) throws SQLException {
 		PreparedStatement insertBalance = connection.prepareStatement("INSERT INTO "+getTableName("transfer")+""
 				+ " (time, player, amount, subject)"
 				+ " VALUES (?, (SELECT id FROM "+getTableName("player")+" WHERE name = ?), ?, (SELECT id FROM "+getTableName("subject")+" WHERE subject = ?))");

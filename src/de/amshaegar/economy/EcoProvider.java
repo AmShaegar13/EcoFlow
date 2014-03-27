@@ -173,15 +173,16 @@ public class EcoProvider {
 		try {
 			connector.insertOrIgnoreSubject(subject);
 			
-			if(connector.insertBalance(player, amount, subject)) {
+			if(connector.insertTransfer(player, amount, subject)) {
 				float balance = getBalance(player);
 				balances.put(player, balance+amount);
 				return new Transfer(true);
+			} else {
+				return new Transfer(false, "Failed to insert transfer into database.");
 			}
 		} catch (SQLException e) {
 			return new Transfer(false, "Transfer failed: "+e.getMessage());
 		}
-		return new Transfer(false, "Transfer failed due to an unknown reason.");
 	}
 
 	public String format(float amount) {

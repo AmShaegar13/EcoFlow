@@ -85,7 +85,7 @@ public class EcoFlow extends JavaPlugin {
 		getCommand("balance").setExecutor(ce);
 		getCommand("deposit").setExecutor(ce);
 		getCommand("withdraw").setExecutor(ce);
-		getCommand("createacc").setExecutor(ce);
+		getCommand("pay").setExecutor(ce);
 		
 		provider = new EcoProvider();
 		new EcoListener();

@@ -78,7 +78,7 @@ public class EcoExecutor implements CommandExecutor {
 			}
 			try {
 				Float amount = Float.parseFloat(args[1].replace(',', '.'));
-				Transfer t = eco.withdraw(p.getName(), amount, String.format("withdrawal by command (%s)", sender.getName()));
+				Transfer t = eco.withdraw(p.getName(), amount, String.format("withdraw by command (%s)", sender.getName()));
 				if(!t.isSuccess()) {
 					sender.sendMessage(ChatColor.DARK_RED+t.getMessage());
 					return true;
@@ -92,7 +92,35 @@ public class EcoExecutor implements CommandExecutor {
 				sender.sendMessage(ChatColor.DARK_RED+String.format(ChatColor.YELLOW+"%s"+ChatColor.DARK_RED+" is not a number.", args[1]));
 			}
 		} else if(commandLabel.equalsIgnoreCase("pay")) {
-			// TODO pay <player> <amount>
+			if(!(sender instanceof Player)) {
+				return false;
+			}
+			if(args.length != 2) {
+				return false;
+			}
+			Player p = (Player) sender;
+			Player q = Bukkit.getPlayerExact(args[0]);
+			if(q == null) {
+				p.sendMessage(ChatColor.DARK_RED+"Player "+ChatColor.YELLOW+args[0]+ChatColor.DARK_RED+" does not exist or is not online.");
+				return true;
+			}
+			try {
+				Float amount = Float.parseFloat(args[1].replace(',', '.'));
+				Transfer t = eco.withdraw(p.getName(), amount, "pay ("+q.getName()+")");
+				if(t.isSuccess()) {
+					t = eco.deposit(q.getName(), amount, "receive ("+p.getName()+")");
+					if(t.isSuccess()) {
+						p.sendMessage(String.format(ChatColor.GREEN+"You payed "+ChatColor.YELLOW+"%s"+ChatColor.GREEN+" to "+ChatColor.YELLOW+"%s", eco.format(amount), q.getName()));
+						q.sendMessage(String.format(ChatColor.GREEN+"You received "+ChatColor.YELLOW+"%s"+ChatColor.GREEN+" from "+ChatColor.YELLOW+"%s", eco.format(amount), p.getName()));
+					} else {
+						q.sendMessage(ChatColor.DARK_RED+t.getMessage());
+					}
+				} else {
+					p.sendMessage(ChatColor.DARK_RED+t.getMessage());
+				}
+			} catch(NumberFormatException e) {
+				p.sendMessage(ChatColor.DARK_RED+String.format(ChatColor.YELLOW+"%s"+ChatColor.DARK_RED+" is not a number.", args[1]));
+			}
 		}
 		return true;
 	}

@@ -12,11 +12,11 @@ commands:
     description: Deposit amount on <player>'s account.
     usage: /deposit <player> <amount>
   withdraw:
-    description: Withdraaw amount from <player>'s account.
+    description: Withdraw amount from <player>'s account.
     usage: /withdraw <player> <amount>
-  createacc:
-    description: Create an account for <player> if they never joined before and deposit initial balance.
-    usage: /createacc <player>
+  pay:
+    description: Pay someone the given amount of money.
+    usage: /pay <player> <amount>
 permissions:
   ecoflow.admin:
     description: Allow use of balance modifying and viewing commands.
