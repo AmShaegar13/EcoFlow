@@ -20,6 +20,7 @@ public class SubjectsTemplate implements Template {
 		SQLConnector connector = EcoFlow.getConnector();
 		try {
 			StringBuilder transfers = new StringBuilder("<table id=\"subjects\">");
+			transfers.append("<tr><th>Alias</th><th>Edit</th><th>Subject</th></tr>");
 			ResultSet rs = connector.selectSubjects(parameters.containsKey("limit") ? Integer.parseInt(parameters.get("limit")) : limit);
 			while(rs.next()) {
 				transfers.append("<tr><td><input type=\"text\" value=\"");
