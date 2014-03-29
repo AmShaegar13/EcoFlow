@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Web Interface: Transfers</title>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("button.edit").click(function(event) {
+					$.post("ajax", {
+							id: event.target.name.substr(4),
+							alias: $("input[name="+event.target.name+"]")[0].value
+						})
+						.done(function(response) {
+							json = JSON.parse(response);
+							if(json.sucess) {
+								alert("Saved!");
+							} else {
+								alert("Error: "+json.error);
+							}
+						});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h1>EcoFlow: Subjects</h1>
+		{LIST_SUBJECTS}
+	</body>
+</html>

@@ -19,13 +19,20 @@ public class SimpleHttpHandler implements HttpHandler {
 	@Override
 	public void handle(HttpExchange e) throws IOException {
 		String root = EcoFlow.getPlugin().getDataFolder().getPath()+"/web";
+		String path = e.getRequestURI().getPath();
 		File f;
-		if(e.getRequestURI().getPath().endsWith("/")) {
-			f = new File(root+e.getRequestURI().getPath()+"index.html");
+		if(path.endsWith("/")) {
+			f = new File(root+path+"index.html");
 		} else {
-			f = new File(root+e.getRequestURI().getPath()+".html");
-			if(!f.exists()) {
-				redirect(301, e.getRequestURI().getPath()+"/", e);
+			f = new File(root+path);
+			if(e.getRequestMethod().equalsIgnoreCase("get")) {
+				if(!f.getName().contains(".")) {
+					f = new File(root+path+".html");
+				}
+				if(!f.exists()) {
+					redirect(301, path+"/", e);
+					return;
+				}
 			}
 		}
 		if(f.exists()) {
