@@ -50,7 +50,7 @@ public class MySQLConnector extends SQLConnector {
 		ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS `"+getTableName("subject")+"` (" +
 				"  `id` INTEGER AUTO_INCREMENT PRIMARY KEY," +
 				"  `alias` VARCHAR(32)," +
-				"  `subject` VARCHAR(255) UNIQUE" +
+				"  `subject` VARCHAR(511) UNIQUE" +
 				");");
 		ps.execute();
 	}

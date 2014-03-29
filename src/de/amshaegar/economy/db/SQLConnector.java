@@ -64,5 +64,11 @@ public abstract class SQLConnector {
 		ps.setInt(1, limit);
 		return ps.executeQuery();
 	}
+	public void updateAlias(int id, String alias) throws SQLException {
+		PreparedStatement ps = connection.prepareStatement("UPDATE "+getTableName("subject")+" SET alias = ? WHERE id = ?");
+		ps.setString(1, alias);
+		ps.setInt(2, id);
+		ps.execute();
+	}
 
 }

@@ -16,6 +16,7 @@ public class WebInterface {
 		server.createContext("/", new TemplateHttpHandler());
 		server.createContext("/auth", new AuthHttpHandler());
 		server.createContext("/intern", new InternHttpHandler());
+		server.createContext("/intern/ajax", new AjaxHttpHandler());
 		server.start();
 		EcoFlow.getPlugin().getLogger().info(String.format("Web interface started on port %d", server.getAddress().getPort()));
 	}

@@ -23,11 +23,15 @@ public class SubjectsTemplate implements Template {
 			transfers.append("<tr><th>Alias</th><th>Edit</th><th>Subject</th></tr>");
 			ResultSet rs = connector.selectSubjects(parameters.containsKey("limit") ? Integer.parseInt(parameters.get("limit")) : limit);
 			while(rs.next()) {
-				transfers.append("<tr><td><input type=\"text\" value=\"");
+				transfers.append("<tr><td><input type=\"text\" name=\"edit");
+				transfers.append(rs.getInt("id"));
+				transfers.append("\" value=\"");
 				if(rs.getString("alias") != null) {
 					transfers.append(rs.getString("alias"));
 				}
-				transfers.append("\" /></td><td><input type=\"submit\" value=\"Edit\" /></td><td>");
+				transfers.append("\" /></td><td><button class=\"edit\" name=\"edit");
+				transfers.append(rs.getInt("id"));
+				transfers.append("\">Edit</button></td><td>");
 				transfers.append(rs.getString("subject"));
 				transfers.append("</td></tr>");
 			}
