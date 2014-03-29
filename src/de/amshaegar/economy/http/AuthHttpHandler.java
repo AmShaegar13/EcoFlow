@@ -27,7 +27,7 @@ public class AuthHttpHandler extends SimpleHttpHandler {
 				EcoFlow.getPlugin().getLogger().warning("Login to web interface from "+e.getRemoteAddress().getAddress().getHostAddress()+" failed!");
 			}
 		}
-		error(403, e);
+		error(400, e);
 	}
 
 }

@@ -15,7 +15,7 @@ public class InternHttpHandler extends TemplateHttpHandler {
 		if(auth) {
 			super.handle(e);
 		} else {
-			error(403, e);
+			error(401, e);
 		}
 	}
 	
