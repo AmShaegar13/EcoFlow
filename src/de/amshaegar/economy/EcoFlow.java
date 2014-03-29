@@ -1,5 +1,6 @@
 package de.amshaegar.economy;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -24,7 +25,16 @@ public class EcoFlow extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		// TODO extract web directory
+		boolean override = true;
+		if(!new File(getDataFolder()+"/web").exists()) {
+			saveResource("web/index.html", override);
+			saveResource("web/intern/index.html", override);
+			saveResource("web/intern/recent.html", override);
+			saveResource("web/intern/subjects.html", override);
+			saveResource("web/error/400.html", override);
+			saveResource("web/error/401.html", override);
+			saveResource("web/error/404.html", override);
+		}
 		plugin = this;
 
 		getConfig().addDefault("settings.balance.init", 10);
@@ -40,7 +50,7 @@ public class EcoFlow extends JavaPlugin {
 		getConfig().addDefault("database.mysql.prefix", "eco_");
 		getConfig().addDefault("database.mysql.user", "username");
 		getConfig().addDefault("database.mysql.password", "password");
-		getConfig().addDefault("database.sqlite.filename", "plugins/"+getName()+"/transfers.db");
+		getConfig().addDefault("database.sqlite.filename", getDataFolder()+"/transfers.db");
 
 		getConfig().addDefault("web.enable", true);
 		getConfig().addDefault("web.port", 8080);
